@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://eyes.nasa.gov/apps/asteroids/assets/default/svg/nasa_logo.svg" type="image/x-icon">
+    <title>NASA Meteorite Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Space Mono', 'Courier New', monospace;
+            overflow: hidden;
+            background: #000;
+            color: #fff;
+            font-weight: 400;
+        }
+
+        /* Loading Screen */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease-out;
+        }
+
+        #loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .nasa-logo {
+            width: 200px;
+            height: 200px;
+            margin-bottom: 40px;
+        }
+
+        .nasa-logo img {
+            width: 100%;
+            height: 100%;
+            filter: brightness(0) invert(1);
+        }
+
+        .loading-text {
+            font-size: 1.2rem;
+            font-weight: 300;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            margin-bottom: 30px;
+            opacity: 0.8;
+        }
+
+        .progress-container {
+            width: 300px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 1px;
+            overflow: hidden;
+        }
+
+        .progress-bar-loading {
+            height: 100%;
+            background: #fff;
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 1px;
+        }
+
+        .loading-percentage {
+            font-size: 0.9rem;
+            font-weight: 300;
+            letter-spacing: 0.1em;
+            margin-top: 15px;
+            opacity: 0.6;
+        }
+
+        #container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        #navigation {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            z-index: 100;
+        }
+
+        .nav-section {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            background: transparent;
+            border: none;
+            transition: background-color 0.15s ease;
+        }
+
+        .nav-section:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-section:first-child {
+            < !-- border-right: 1px solid rgba(255, 255, 255, 0.3);
+            -->
+        }
+
+        .nav-content {
+            text-align: center;
+            z-index: 2;
+        }
+
+        .nav-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            line-height: 1;
+        }
+
+        .nav-subtitle {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
+            font-weight: 400;
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: transparent;
+            overflow: hidden;
+            opacity: 0;
+            transition: opacity 0.15s ease;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #fff;
+            width: 0%;
+            transition: width 2s linear;
+        }
+
+        .nav-section:hover .progress-bar {
+            opacity: 1;
+        }
+
+        #three-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        .title-overlay {
+            position: absolute;
+            top: 40px;
+            left: 40px;
+            text-align: left;
+            z-index: 50;
+        }
+
+        .main-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            line-height: 1;
+        }
+
+        .main-subtitle {
+            font-size: 0.7rem;
+            opacity: 0.6;
+            text-transform: uppercase;
+            letter-spacing: 0.4em;
+            font-weight: 400;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="nasa-logo">
+            <img src="https://eyes.nasa.gov/apps/asteroids/assets/default/svg/nasa_logo.svg" alt="NASA Logo" />
+        </div>
+        <div class="loading-text">NASA Textures</div>
+        <div class="progress-container">
+            <div class="progress-bar-loading" id="loading-progress"></div>
+        </div>
+        <div class="loading-percentage" id="loading-percentage">0%</div>
+    </div>
+
+    <div id="container">
+        <canvas id="three-canvas"></canvas>
+
+        <div class="title-overlay">
+            <div class="nasa-logo-title"
+                style="width: 50px; height: 50px; margin-bottom: 10px; display: flex; flex-direction: row; align-items: center;">
+                <img src="https://eyes.nasa.gov/apps/asteroids/assets/default/svg/nasa_logo.svg" alt="NASA Logo"
+                    style="padding-right: 10px;" />
+                <h1 class="main-title">NASA</h1>
+            </div>
+            <p class="main-subtitle">METEORITE MADNESS</p>
+        </div>
+
+        <div id="navigation">
+            <div class="nav-section" id="left-section">
+                <div class="nav-content" style="transform: rotate(-90deg);">
+                    <h2 class="nav-title">SIMUL</h2>
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nav-section" id="right-section">
+                <div class="nav-content" style="transform: rotate(90deg);">
+                    <h2 class="nav-title">3D ENV</h2>
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Loading screen management
+        const loadingScreen = document.getElementById('loading-screen');
+        const loadingProgress = document.getElementById('loading-progress');
+        const loadingPercentage = document.getElementById('loading-percentage');
+
+        let totalTextures = 1;
+        let loadedTextures = 0;
+
+        function updateLoadingProgress() {
+            const progress = (loadedTextures / totalTextures) * 100;
+            loadingProgress.style.width = progress + '%';
+            loadingPercentage.textContent = Math.round(progress) + '%';
+
+            if (progress >= 100) {
+                setTimeout(() => {
+                    loadingScreen.classList.add('hidden');
+                    setTimeout(() => {
+                        loadingScreen.style.display = 'none';
+                    }, 500);
+                }, 500);
+            }
+        }
+
+        // Three.js setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({canvas: document.getElementById('three-canvas'), alpha: true});
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        const earthGeometry = new THREE.SphereGeometry(25, 74, 74);
+        const earthMaterial = new THREE.MeshPhongMaterial({
+            color: 0x6B88ff,
+            shininess: 10,
+            specular: 0x111111
+        });
+
+        const earth = new THREE.Mesh(earthGeometry, earthMaterial);
+        earth.position.set(0, 0, -60);
+        earth.rotationSpeed = 0.003;
+        scene.add(earth);
+
+        // Load NASA Earth texture with progress tracking
+        const textureLoader = new THREE.TextureLoader();
+        textureLoader.load(
+            'https://raw.githubusercontent.com/nasa/NASA-3D-Resources/master/Images%20and%20Textures/Earth%20(A)/Earth%20(A).jpg',
+            function (texture) {
+                earth.material.map = texture;
+                earth.material.needsUpdate = true;
+                loadedTextures++;
+                updateLoadingProgress();
+            },
+            function (progress) {
+                if (progress.lengthComputable) {
+                    const textureProgress = (progress.loaded / progress.total) * 100;
+                    loadingProgress.style.width = textureProgress + '%';
+                    loadingPercentage.textContent = Math.round(textureProgress) + '%';
+                }
+            },
+            function (error) {
+                console.log('Earth texture failed, using fallback color');
+                earth.material.color.setHex(0x6B93D6);
+                loadedTextures++;
+                updateLoadingProgress();
+            }
+        );
+
+        // Create subtle atmospheric glow around Earth
+        const atmosphereGeometry = new THREE.SphereGeometry(16.5, 64, 64);
+        const atmosphereMaterial = new THREE.ShaderMaterial({
+            vertexShader: `
+                varying vec3 vNormal;
+                void main() {
+                    vNormal = normalize(normalMatrix * normal);
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `,
+            fragmentShader: `
+                varying vec3 vNormal;
+                void main() {
+                    float intensity = pow(0.8 - dot(vNormal, vec3(0, 0, 1.0)), 2.0);
+                    gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0) * intensity * 0.15;
+                }
+            `,
+            side: THREE.BackSide,
+            blending: THREE.AdditiveBlending,
+            transparent: true
+        });
+        const atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
+        atmosphere.position.copy(earth.position);
+        scene.add(atmosphere);
+
+        // Add minimal lighting for Earth
+        const ambientLight = new THREE.AmbientLight(0x404040, 0.4);
+        scene.add(ambientLight);
+
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
+        directionalLight.position.set(10, 10, 5);
+        scene.add(directionalLight);
+
+        camera.position.z = 5;
+
+        // Animation
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Rotate Earth realistically
+            earth.rotation.y += earth.rotationSpeed;
+
+            // Sync atmosphere with Earth
+            atmosphere.position.copy(earth.position);
+            atmosphere.rotation.y += 0.001;
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Navigation logic
+        let hoverTimer = null;
+        let currentSection = null;
+
+        function startHoverTimer(section, action) {
+            if (hoverTimer) clearTimeout(hoverTimer);
+            currentSection = section;
+
+            const progressFill = section.querySelector('.progress-fill');
+            progressFill.style.width = '100%';
+
+            hoverTimer = setTimeout(() => {
+                action();
+            }, 2000);
+        }
+
+        function stopHoverTimer() {
+            if (hoverTimer) {
+                clearTimeout(hoverTimer);
+                hoverTimer = null;
+            }
+
+            if (currentSection) {
+                const progressFill = currentSection.querySelector('.progress-fill');
+                progressFill.style.width = '0%';
+                currentSection = null;
+            }
+        }
+
+        // Left section - Data Explorer (placeholder)
+        document.getElementById('left-section').addEventListener('mouseenter', () => {
+            startHoverTimer(document.getElementById('left-section'), () => {
+                window.location.href = 'http://localhost:5000/meteoritos'
+            });
+        });
+
+        // Right section - 3D Environment
+        document.getElementById('right-section').addEventListener('mouseenter', () => {
+            startHoverTimer(document.getElementById('right-section'), () => {
+                window.location.href = '3denv.html';
+            });
+        });
+
+        // Stop timer when leaving sections
+        document.getElementById('left-section').addEventListener('mouseleave', stopHoverTimer);
+        document.getElementById('right-section').addEventListener('mouseleave', stopHoverTimer);
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+
+</html>

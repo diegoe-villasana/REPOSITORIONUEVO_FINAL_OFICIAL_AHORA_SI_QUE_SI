@@ -1,0 +1,441 @@
+/* --- Estilos Globales --- */
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    background-color: #121212;
+    color: #e0e0e0;
+    line-height: 1.6;
+}
+
+.dark-panel { cursor:pointer; padding: 0; }
+
+/* Dark mode for analysis panels */
+.dark-panel {
+    background: rgba(6,6,8,0.82) !important;
+    border: 1px solid rgba(255,255,255,0.04) !important;
+    color: #e8eef6;
+}
+
+.dark-panel .panel-header {
+    background: transparent;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+
+.dark-panel .panel-content {
+    color: #e8eef6;
+}
+
+.dark-panel input, .dark-panel select, .dark-panel textarea {
+    background: #0f1113;
+    border: 1px solid rgba(255,255,255,0.06);
+    color: #e8eef6;
+    padding: 8px 10px;
+    border-radius: 6px;
+}
+
+.dark-panel .form-group label { color: rgba(255,255,255,0.8); }
+
+.dark-panel .filter-btn, .dark-panel .form-group button {
+    background: linear-gradient(180deg, rgba(80,100,255,0.12), rgba(40,60,200,0.12));
+    border: 1px solid rgba(255,255,255,0.06);
+    color: #e8eef6;
+}
+
+.dark-panel .filter-btn:hover, .dark-panel .form-group button:hover {
+    background: linear-gradient(180deg, rgba(80,100,255,0.18), rgba(40,60,200,0.18));
+}
+
+/* Reduce visual weight of collapse icon on dark panels */
+.dark-panel .collapse-icon { background: rgba(255,255,255,0.02); color: #e8eef6; }
+
+/* Collapsible content behaviour */
+.panel-content.collapsed {
+    max-height: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.32s ease, opacity 0.24s ease, padding 0.24s ease;
+}
+
+.collapse-icon.rotated {
+    transform: rotate(180deg);
+    transition: transform 0.25s ease;
+}
+
+/* Icon styles */
+.icon { display:inline-block; vertical-align:middle; fill:currentColor; color:inherit; }
+.icon-info, .icon-gear { margin-right:8px; opacity:0.95; }
+.chevron { transition: transform 0.25s ease; }
+.panel-header .icon { width:16px; height:16px; }
+.filter-btn .icon { margin-right:8px; vertical-align:middle; }
+a {
+    color: #4dabf7;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #8ce99a;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 1rem;
+}
+
+.card {
+    background-color: #1e1e1e;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+h1, h2, h3 {
+    font-weight: 300;
+    color: #ffffff;
+}
+
+h1 { font-size: 3rem; }
+h2 { font-size: 2.2rem; border-bottom: 2px solid #4dabf7; padding-bottom: 0.5rem; margin-bottom: 1.5rem; }
+h3 { font-size: 1.5rem; color: #4dabf7; }
+
+/* --- Barra de Navegación --- */
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    background: rgba(18, 18, 18, 0.8);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid #333;
+}
+
+/* Auto-hide header: moved out of view when hidden, with smooth transition */
+header {
+    transition: transform 0.28s ease, opacity 0.28s ease;
+    will-change: transform, opacity;
+}
+
+header.hidden {
+    transform: translateY(-100%);
+    opacity: 0;
+    pointer-events: none; /* avoid capturing clicks when hidden */
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 5%;
+}
+
+nav .logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    margin: 0;
+    padding: 0;
+}
+
+nav ul li {
+    margin-left: 2rem;
+}
+
+nav ul li a {
+    font-weight: 400;
+    padding-bottom: 5px;
+    border-bottom: 2px solid transparent;
+}
+
+nav ul li a.active, nav ul li a:hover {
+    border-bottom-color: #4dabf7;
+    color: #fff;
+}
+
+/* --- Página Principal (index.html) --- */
+.carousel-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.carousel-slide {
+    display: flex;
+    width: 800%; /* 100% por cada una de las 8 imágenes */
+    height: 100%;
+    transition: transform 1.5s ease-in-out;
+}
+
+.carousel-slide img {
+    width: 12.5%; /* 100 / 8 */
+    height: 100%;
+    object-fit: cover;
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.main-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+    padding: 0 1rem;
+}
+
+.hero h1 {
+    text-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
+}
+
+.hero p {
+    font-size: 1.2rem;
+    font-weight: 300;
+    max-width: 600px;
+    margin: 1rem auto 0;
+}
+
+/* --- Contenido de Páginas Secundarias --- */
+.page-content {
+    padding-top: 80px; /* Altura de la barra de navegación */
+}
+
+/* --- Página de Simulación --- */
+.simulation-area {
+    height: 60vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #000;
+    border: 1px dashed #444;
+}
+
+/* --- Página de Análisis de Impacto --- */
+.analysis-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
+}
+
+#map {
+    height: 300px;
+    background-color: #333;
+    margin-bottom: 1.5rem;
+    border-radius: 5px;
+    border: 1px solid #555;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+.form-group input, .form-group button {
+    width: calc(100% - 20px);
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #555;
+    background-color: #333;
+    color: #fff;
+}
+
+.form-group button {
+    width: 100%;
+    cursor: pointer;
+    background-color: #4dabf7;
+    border: none;
+    font-weight: 700;
+    transition: background-color 0.3s ease;
+}
+
+.form-group button:hover {
+    background-color: #3690d1;
+}
+
+#meteorite-features ul {
+    list-style: none;
+    padding: 0;
+}
+
+#meteorite-features li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #333;
+}
+
+#meteorite-features li:last-child {
+    border-bottom: none;
+}
+
+/* --- Página de Fuentes --- */
+.sources-list {
+    list-style: none;
+    padding: 0;
+}
+
+.sources-list li {
+    background-color: #2a2a2a;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    border-radius: 5px;
+}
+
+/* --- Responsividad --- */
+@media (max-width: 768px) {
+    nav {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    nav ul {
+        margin-top: 1rem;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    nav ul li {
+        margin: 0.5rem 0;
+    }
+
+    .page-content {
+        padding-top: 150px; /* Mayor espacio para nav expandido */
+    }
+
+    h1 { font-size: 2.5rem; }
+    h2 { font-size: 1.8rem; }
+}
+
+/* --- Glass HUD / Panels for Impact Analysis tab --- */
+.glass-panel {
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    color: #fff;
+    position: relative;
+    padding: 0;
+    min-width: 260px;
+    max-width: 340px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    transition: transform 0.28s ease, opacity 0.28s ease;
+}
+
+.glass-panel .panel-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: default;
+}
+
+.glass-panel .panel-header h3 { margin:0; font-size:15px; }
+
+.panel-content { padding: 12px 16px; font-size:14px; }
+.panel-content .info-row { display:flex; justify-content:space-between; margin-bottom:10px; }
+.info-label { color: rgba(255,255,255,0.7); font-weight:600; }
+.info-value { color: #fff; font-weight:500; }
+
+.impact-section { border-top:1px solid rgba(255,255,255,0.05); padding-top:10px; margin-top:8px; }
+.impact-energy { color:#ff7b7b; font-weight:700; }
+.impact-scale { color:#ffd36b; font-weight:700; }
+.impact-comparison { color: rgba(255,255,255,0.8); font-style:italic; }
+
+.collapse-icon { cursor:pointer; padding:6px 8px; border-radius:8px; background:rgba(255,255,255,0.03); }
+
+#visualization-area.card { padding:12px; display:flex; flex-direction:column; gap:12px; }
+
+.fab-container { position:fixed; bottom:28px; left:50%; transform:translateX(-50%); display:flex; gap:10px; z-index:101; }
+.fab { width:48px; height:48px; border-radius:24px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); display:flex; align-items:center; justify-content:center; cursor:pointer; }
+
+/* Meteorite overlay card */
+.meteorite-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); display:flex; align-items:center; justify-content:center; z-index:2000; }
+.meteorite-info-card { background: rgba(255,255,255,0.07); border-radius:12px; padding:20px; max-width:520px; color:#fff; border:1px solid rgba(255,255,255,0.08); }
+.meteorite-stats { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:12px; }
+.meteorite-stat { background:rgba(255,255,255,0.02); padding:10px; border-radius:8px; }
+.stat-label { font-size:11px; color:rgba(255,255,255,0.7); }
+.stat-value { font-size:16px; font-weight:700; }
+
+@media (max-width: 768px) {
+    #controls-panel, #info-panel { max-width: calc(100vw - 40px); width: calc(100vw - 40px); }
+    #visualization-area { order: -1; }
+}
+
+/* Make panels float above the full-screen map */
+#info-panel { position: fixed; top: 20px; left: 20px; z-index: 2000; }
+#controls-panel { position: fixed; top: 20px; right: 20px; z-index: 2000; }
+#neo-panel { position: fixed; bottom: 20px; right: 20px; z-index: 2000; }
+
+/* Globe is shown in a modal opened from the controls; mini-globe removed per user request. */
+/* Globe modal styles (restored) */
+#globe-modal { display: none; align-items: center; justify-content: center; }
+#globe-modal > div { width: 90vw; height: 80vh; background: #000; border-radius: 10px; overflow: hidden; position: relative; }
+#globeViz { width: 100%; height: 100%; }
+
+/* Floating 2D/3D toggle button */
+#toggle-2d3d { transition: transform 0.18s ease, background 0.18s ease; }
+#toggle-2d3d:active { transform: scale(0.96); }
+
+/* When in 3D-expanded mode, hide the Leaflet map and let the globe canvas occupy the map container */
+.map-3d-active #globeViz { position:fixed; inset:0; width:100vw !important; height:100vh !important; z-index:3000; border-radius:0 !important; }
+.map-3d-active #globe-modal { display:flex !important; }
+/* Keep HUD panels visible above the globe canvas when in 3D mode */
+.map-3d-active #info-panel, .map-3d-active #controls-panel, .map-3d-active #neo-panel {
+    display: block !important; /* ensure panels are visible */
+    z-index: 50000 !important; /* much higher than globe canvas */
+    pointer-events: auto !important; /* allow interaction */
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+#globe-modal .filter-btn { position: absolute; top: 10px; right: 10px; z-index: 10; }
+
+/* Back-to-2D button styling when 3D is active */
+#back-to-2d { transition: opacity 0.18s ease, transform 0.18s ease; opacity: 0; pointer-events: none; display:none; }
+.map-3d-active #back-to-2d { display:block !important; opacity:1 !important; pointer-events:auto !important; transform: translateY(0) !important; }
+
+/* Theme buttons inside globe modal */
+#globe-modal [data-globe-theme] {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+#globe-modal [data-globe-theme]:hover { background: rgba(255,255,255,0.1); }
+
+/* Ensure main content doesn't create extra scrollbars behind the fixed map */
+main.page-content { position: relative; z-index: 100; }
+
+/* Map container adjustments: full viewport handled inline in HTML, set leaflet container to full area */
+#map { z-index: 0; }
+/* Globe modal removed: globe is now integrated and toggles between the mini globe and the map container. */
+/* Globe modal styles (restored) */
+/* Removed modal styles; using always-visible overlay */

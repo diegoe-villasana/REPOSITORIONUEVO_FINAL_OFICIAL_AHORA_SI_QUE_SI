@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="https://eyes.nasa.gov/apps/asteroids/assets/default/svg/nasa_logo.svg" type="image/x-icon">
+  <title>NASA Earth-Moon-NEO Visualization</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+    rel="stylesheet">
+  <!-- CSS Styles -->
+  <link rel="stylesheet" href="styles.css">
+  <!-- External Libraries -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
+  <script type="importmap">
+      {
+			"imports": {
+				"@google/generative-ai": "https://esm.run/@google/generative-ai"
+			}
+		}
+    </script>
+</head>
+
+<body>
+  <div id="container"></div>
+  <div id="logo-home">
+    <a href="./index.html" title="NASA NEOs Home">
+      <img src="https://eyes.nasa.gov/apps/asteroids/assets/default/svg/nasa_logo.svg" alt="NASA Logo" />
+    </a>
+  </div>
+  <!-- Info Panel -->
+  <div id="info-panel" class="glass-panel">
+    <div class="panel-header" onclick="togglePanel('info')">
+      <h3><i data-lucide="globe" class="lucide-icon"></i>NEO System</h3>
+      <div class="collapse-icon" id="info-collapse"><i data-lucide="chevron-down" class="lucide-icon"></i></div>
+    </div>
+    <div class="panel-content" id="info-content">
+      <div class="info-row">
+        <span class="info-label">Earth Diameter:</span>
+        <span class="info-value">12,742 km</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Moon Diameter:</span>
+        <span class="info-value">3,474 km (27%)</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Distance:</span>
+        <span class="info-value">384,400 km</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">NEOs:</span>
+        <span class="info-value" id="neo-count">Loading...</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Hazardous:</span>
+        <span class="info-value" id="hazardous-count">0</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Camera Mode:</span>
+        <span class="info-value">
+          <div class="mode-indicator">
+            <div class="mode-dot" id="mode-dot"></div>
+            <span id="mode-text">Auto</span>
+          </div>
+        </span>
+      </div>
+    </div>
+  </div>
+  <!-- Controls Panel -->
+  <div id="controls-panel" class="glass-panel">
+    <div class="panel-header" onclick="togglePanel('controls')">
+      <h3><i data-lucide="settings" class="lucide-icon"></i>NEO Filters:</h3>
+      <div class="collapse-icon" id="controls-collapse"><i data-lucide="chevron-down" class="lucide-icon"></i></div>
+    </div>
+    <div class="panel-content" id="controls-content">
+      <div class="filter-section">
+        <!-- <div class="filter-label">NEO Filters</div> -->
+        <div class="filter-buttons">
+          <div class="filter-btn active" id="filter-hazardous"><i data-lucide="alert-circle" class="lucide-icon"
+              style="color: #ff44ff;"></i>Hazardous</div>
+          <div class="filter-btn active" id="filter-safe"><i data-lucide="check-circle" class="lucide-icon"
+              style="color: #44ff44;"></i>Safe</div>
+          <div class="filter-btn active" id="filter-trajectories"><i data-lucide="trending-up" class="lucide-icon"
+              style="color: #ffffff;"></i>Trajectories</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Performance Panel -->
+  <div id="performance-panel" class="glass-panel">
+    <div class="panel-header" onclick="togglePanel('performance')">
+      <h3><i data-lucide="bar-chart-4" class="lucide-icon"></i>Performance</h3>
+      <div class="collapse-icon" id="performance-collapse"><i data-lucide="chevron-down" class="lucide-icon"></i></div>
+    </div>
+    <div class="panel-content performance-content" id="performance-content">
+      <div class="perf-metric">
+        <span>FPS:</span>
+        <span class="perf-value" id="fps">60</span>
+      </div>
+      <div class="perf-metric">
+        <span>Frame Time:</span>
+        <span class="perf-value"><span id="frame-time">16.67</span>ms</span>
+      </div>
+      <div class="perf-metric">
+        <span>Objects:</span>
+        <span class="perf-value" id="object-count">0</span>
+      </div>
+      <div class="perf-metric">
+        <span>Geometry:</span>
+        <span class="perf-value">Shared/LOD</span>
+      </div>
+    </div>
+  </div>
+  <!-- NEO Info Panel -->
+  <div id="neo-panel" class="glass-panel">
+    <div class="panel-header" onclick="togglePanel('neo')">
+      <h3 id="neo-name"><i data-lucide="target" class="lucide-icon"></i>NEO Details</h3>
+      <div class="collapse-icon" id="neo-collapse"><i data-lucide="chevron-down" class="lucide-icon"></i></div>
+    </div>
+    <div class="panel-content" id="neo-content">
+      <div class="info-row">
+        <span class="info-label">Diameter:</span>
+        <span class="info-value"><span id="neo-mass">0</span>
+          meters</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Orbit Distance:</span>
+        <span class="info-value"><span id="neo-year">0</span>
+          AU</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Hazardous:</span>
+        <span class="info-value" id="neo-coords">No</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">ID:</span>
+        <span class="info-value" id="neo-id">-</span>
+      </div>
+      <div class="impact-section">
+        <div class="info-row" style="margin-bottom: 5px;">
+          <span class="info-label" style="font-weight: 600;">Hypothetical Earth Impact:</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Mass:</span>
+          <span class="info-value" id="neo-impact-mass">0 tons</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Impact Energy:</span>
+          <span class="info-value impact-energy" id="neo-impact-energy">0 kilotons</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Impact Scale:</span>
+          <span class="info-value impact-scale" id="neo-impact-scale">-</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Comparison:</span>
+          <span class="info-value impact-comparison" id="neo-impact-comparison">-</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- AI Assistant Panel -->
+  <div id="ai-panel" class="glass-panel ai-panel">
+    <div class="panel-header" onclick="togglePanel('ai')">
+      <h3><i data-lucide="brain" class="lucide-icon"></i>AI Assistant</h3>
+      <div class="collapse-icon" id="ai-collapse"><i data-lucide="chevron-down" class="lucide-icon"></i></div>
+    </div>
+    <div class="panel-content" id="ai-content">
+      <div class="chat-container" id="chat-container">
+        <div class="chat-messages" id="chat-messages">
+          <div class="assistant-message">
+            <div class="message-avatar">
+              <h3><i data-lucide="brain" class="lucide-icon"></i></h3>
+            </div>
+          </div>
+        </div>
+        <div class="chat-input-container">
+          <input type="text" id="chat-input" placeholder="Ask about NEOs or space objects...">
+          <button id="send-message" class="chat-button">
+            <i data-lucide="send" class="lucide-icon"></i>
+          </button>
+          <button id="voice-toggle" class="chat-button voice-button">
+            <i data-lucide="mic" class="lucide-icon"></i>
+          </button>
+        </div>
+      </div>
+      <div class="voice-controls">
+        <div class="voice-status" id="voice-status">
+          <div class="status-indicator" id="status-indicator"></div>
+          <span id="status-text">Voice Ready</span>
+        </div>
+        <div class="audio-controls">
+          <button id="mute-toggle" class="audio-button" title="Mute/Unmute Narration">
+            <i data-lucide="volume-2" class="lucide-icon"></i>
+          </button>
+          <div class="volume-slider">
+            <input type="range" id="volume-control" min="0" max="100" value="70">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Floating Action Buttons -->
+  <div class="fab-container">
+    <div class="fab" id="fab-performance" onclick="togglePerformancePanel()" title="Performance Stats"><i
+        data-lucide="bar-chart-4" class="lucide-icon"></i></div>
+    <div class="fab" id="fab-camera" onclick="toggleCameraMode()" title="Camera Mode"><i data-lucide="camera"
+        class="lucide-icon"></i></div>
+    <div class="fab" id="fab-ai" onclick="togglePanel('ai')" title="AI Assistant"><i data-lucide="brain"
+        class="lucide-icon"></i></div>
+    <div class="fab" id="fab-info" onclick="toggleAllPanels()" title="Toggle All Panels"><i data-lucide="info"
+        class="lucide-icon"></i></div>
+  </div>
+  <div id="loading">
+    <div class="nasa-logo">
+      <img src="https://eyes.nasa.gov/apps/asteroids/assets/default/svg/nasa_logo.svg" alt="NASA Logo" />
+    </div>
+    <div class="loading-text">Loading Environment</div>
+    <div class="progress-container">
+      <div class="progress-bar-loading" id="loading-progress"></div>
+    </div>
+    <div class="loading-percentage" id="loading-percentage">0%</div>
+  </div>
+  <!-- JavaScript Application -->
+  <script type="module" src="app.js"></script>
+</body>
+
+</html>

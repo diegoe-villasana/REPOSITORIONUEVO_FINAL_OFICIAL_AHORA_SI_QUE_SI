@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fuentes - Impacto Estelar</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="index.html" class="logo">Impacto Estelar</a>
+            <ul>
+                <li><a href="{{ url_for('home') }}">Inicio</a></li>
+                <li><a href="{{ url_for('simulacion') }}">Simulación</a></li>
+                <li><a href="{{ url_for('meteoritos') }}">Análisis de Impacto</a></li>
+                <li><a href="{{ url_for('fuerntes') }}">Fuentes</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="page-content">
+        <section class="container">
+            <h2>Fuentes de Información</h2>
+            <div class="card">
+                <p>A continuación se enumeran las fuentes de datos, APIs y bibliotecas utilizadas en este proyecto.</p>
+                <ul class="sources-list">
+                    <li><strong>NASA Open APIs:</strong> Para datos sobre meteoritos y objetos cercanos a la Tierra. <a href="https://api.nasa.gov/" target="_blank">https://api.nasa.gov/</a></li>
+                    <li><strong>CesiumJS:</strong> Biblioteca de código abierto para la visualización geoespacial 3D (si se usa en la simulación). <a href="https://cesium.com/platform/cesiumjs/" target="_blank">https://cesium.com/platform/cesiumjs/</a></li>
+                    <li><strong>Google Fonts:</strong> Para la tipografía 'Roboto'. <a href="https://fonts.google.com/" target="_blank">https://fonts.google.com/</a></li>
+                    <!-- Añade aquí otras fuentes que utilices -->
+                </ul>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

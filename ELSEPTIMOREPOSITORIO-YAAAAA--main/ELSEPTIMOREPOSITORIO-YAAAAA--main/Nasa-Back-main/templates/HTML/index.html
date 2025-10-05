@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Impacto Estelar - Inicio</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="carousel-container">
+        <div class="carousel-slide">
+            <img src="{{ url_for('static', filename='img/c2.avif') }}" alt="Imagen de cráter 1">
+            <img src="{{ url_for('static', filename='img/c3.avif') }}" alt="Imagen de cráter 2">
+            <img src="{{ url_for('static', filename='img/c4.avif') }}" alt="Imagen de cráter 3">
+            <img src="{{ url_for('static', filename='img/c5.avif') }}" alt="Imagen de cráter 4">
+            <img src="{{ url_for('static', filename='img/c6.avif') }}" alt="Imagen de cráter 5">
+            <img src="{{ url_for('static', filename='img/c7.avif') }}" alt="Imagen de cráter 6">
+            <img src="{{ url_for('static', filename='img/c8.avif') }}" alt="Imagen de cráter 7">
+            <img src="{{ url_for('static', filename='img/c9.avif') }}" alt="Imagen de cráter 8">
+        </div>
+        <div class="overlay"></div>
+    </div>
+
+    <header>
+        <nav>
+            <a href="index.html" class="logo">Impacto Estelar</a>
+            <ul>
+                <li><a href="{{ url_for('home') }}">Inicio</a></li>
+                <li><a href="{{ url_for('simulacion') }}">Simulación</a></li>
+                <li><a href="{{ url_for('meteoritos') }}">Análisis de Impacto</a></li>
+                <li><a href="{{ url_for('fuerntes') }}">Fuentes</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <section class="hero">
+            <h1>Explorando el Impacto Cósmico</h1>
+            <p>Un análisis interactivo sobre meteoritos y sus consecuencias.</p>
+        </section>
+    </main>
+
+    <script src="../JS/main.js"></script>
+</body>
+</html>

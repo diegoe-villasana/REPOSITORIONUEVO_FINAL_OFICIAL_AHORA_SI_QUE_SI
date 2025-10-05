@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis de Impacto - Impacto Estelar</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="{{ url_for('static', filename='peticiones.js') }}"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div style="padding:12px 20px; background:linear-gradient(180deg,#07293a,#03324a); color:#fff;">
+            <h1 style="margin:0; font-size:18px;">Análisis de Impacto</h1>
+        </div>
+    </header>
+
+    <main class="page-content">
+        <section class="container">
+            <h2>Análisis de Impacto de Meteoritos</h2>
+            <p>Utiliza las herramientas a continuación para explorar los datos de impacto de meteoritos proporcionados por las APIs de la NASA.</p>
+
+            <div class="analysis-grid">
+                <!-- Visualización central (mapa / simulador) -->
+                <div id="visualization-area" class="card">
+                    <h3 style="margin-bottom:8px;">Simulador de Impacto</h3>
+                    <div id="map" style="height:100vh; width:100vw; border-radius:0; overflow:hidden; border:0; position:fixed; top:0; left:0; z-index:0;"></div>
+                </div>
+
+                <!-- Panel izquierdo: Información del meteorito (formato glass-panel) -->
+                <aside class="glass-panel dark-panel" id="info-panel" style="max-height:calc(100vh - 80px); overflow:auto;">
+                    <div class="panel-header" id="info-panel-header">
+                        <h3>
+                            <!-- info icon -->
+                            <svg class="icon icon-info" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" fill="currentColor" opacity="0.12"></path>
+                                <path d="M11 17h2v-6h-2v6zm0-8h2V7h-2v2z" fill="currentColor"></path>
+                            </svg>
+                            Información del Meteorito
+                        </h3>
+                        <button class="collapse-icon" id="info-collapse" aria-expanded="true" aria-controls="meteorite-info">
+                            <!-- chevron -->
+                            <svg class="icon chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                                <path d="M7 10l5 5 5-5H7z" fill="currentColor" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="panel-content" id="meteorite-info">
+                        <div class="info-row"><span class="info-label" >Nombre</span><span class="info-value"  id="Resultado_meteoro">N/A</span></div>
+                        <div class="info-row"><span class="info-label">Velocidad</span><span class="info-value" id="Resultado_Velocidad">N/A</span></div>
+                        <div class="info-row"><span class="info-label">tamano</span><span class="info-value" id="Resultado_tamano">N/A</span></div>
+                        <div class="info-row"><span class="info-label">Orbita</span><span class="info-value" id="Resultado_orbit_an">N/A</span></div>
+
+
+                        <div class="impact-section">
+                            <div class="info-row"><span class="info-label"id="Resultado_Energia Estimada">Energía estimada</span><span class="impact-energy" id="impact-energy">—</span></div>
+                            <div class="info-row"><span class="info-label">Escala de impacto</span><span class="impact-scale" id="Resultado_Escala">—</span></div>
+                            <div class="info-row"><span class="info-label">Comparación</span><span class="impact-comparison" id="impact-comparison">—</span></div>
+                        </div>
+
+                        <!-- Resultado de Gemini -->
+                        <div class="gemini-result" id="gemini-result" style="margin-top:12px; border-top:1px solid rgba(255,255,255,0.04); padding-top:10px;">
+                            <h4 style="margin:0 0 8px 0; font-size:14px;">Análisis (Gemini)</h4>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <div id="gemini-loader" style="display:none; width:16px; height:16px; border:2px solid rgba(255,255,255,0.15); border-top-color:#fff; border-radius:50%; animation:spin 1s linear infinite"></div>
+                                <div id="gemini-text" style="font-size:13px; line-height:1.3; color:#e6eef8;">Esperando simulación...</div>
+                            </div>
+                        </div>
+
+                        <style>
+                        @keyframes spin { to { transform: rotate(360deg); } }
+                        </style>
+
+                        <!-- detalles adicionales eliminados para simplificar la página -->
+                    </div>
+                </aside>
+
+                <!-- Panel derecho: Controles (formulario) -->
+                <aside class="glass-panel dark-panel" id="controls-panel" style="max-height:calc(100vh - 80px); overflow:auto;">
+                    <div class="panel-header"><h3>
+                        <!-- settings icon -->
+                        <svg class="icon icon-gear" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                            <path d="M19.14 12.936a7.003 7.003 0 0 0 .06-.936 7.003 7.003 0 0 0-.06-.936l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.03 7.03 0 0 0-1.62-.94l-.36-2.54A.5.5 0 0 0 13.5 2h-3a.5.5 0 0 0-.5.42l-.36 2.54c-.58.24-1.12.56-1.62.94l-2.39-.96a.5.5 0 0 0-.6.22L2.2 8.48a.5.5 0 0 0 .12.64l2.03 1.58c-.04.31-.06.63-.06.95s.02.64.06.95L2.32 14.8a.5.5 0 0 0-.12.64l1.92 3.32c.14.24.42.34.66.26l2.39-.96c.5.38 1.04.7 1.62.94l.36 2.54c.05.28.28.48.5.48h3c.22 0 .45-.2.5-.48l.36-2.54c.58-.24 1.12-.56 1.62-.94l2.39.96c.24.08.52-.02.66-.26l1.92-3.32c.14-.24.06-.52-.12-.64l-2.02-1.58zM12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7z" fill="currentColor"/>
+                        </svg>
+                        Controles de Simulación
+                    </h3></div>
+                    <div class="panel-content">
+                        <!-- Selector de meteoritos desde la base y meteoritos personalizados -->
+                        <div class="form-group">
+                            <label for="meteorite-select" >Seleccionar meteorito de la base:</label>
+                            <div style="display:flex; gap:8px; align-items:center;">
+                                <select id="meteorite-select" style="flex:1;" id="Meterorito">
+                                <option value="433 Eros A898 PA">433 Eros A898 PA</option>
+                                <option value="719 Albert A911 TB">719 Albert A911 TB</option>
+                                <option value="887 Alinda A918 AA">887 Alinda A918 AA</option>
+                                <option value="1036 Ganymed A924 UB">036 Ganymed A924 UB</option>
+                                </select>
+                                <button id="load-meteorite" class="filter-btn" type="button">Cargar</button>
+                            </div>
+                <div style="margin-top:8px; display:flex; gap:8px;">
+                    <button id="use-simulate" class="filter-btn" type="button">Usar y Simular</button>
+
+                            </div>
+                        </div>
+
+                        <!-- Formulario para crear meteoritos personalizados -->
+                        <div style="margin-top:12px; border-top:1px solid rgba(255,255,255,0.04); padding-top:10px;">
+                            <h4 style="margin:0 0 8px 0; font-size:14px;">Crear meteorito personalizado</h4>
+                            <div class="form-group">
+                                <label for="custom-name">Nombre</label>
+                                <input type="text" id="custom-name" placeholder="Ej: MiMeteorito">
+                            </div>
+                            <div class="form-group">
+                                <label for="custom-diameter">Diámetro (m)</label>
+                                <input type="number" id="custom-diameter" value="1000">
+                            </div>
+                            <div class="form-group">
+                                <label for="custom-velocity">Velocidad (km/s)</label>
+                                <input type="number" id="custom-velocity" value="20">
+                            </div>
+                            <div class="form-group">
+                                <label for="custom-density">Densidad (kg/m³)</label>
+                                <input type="number" id="custom-density" value="3000">
+                            </div>
+                            <div style="display:flex; gap:8px;">
+                                <button id="add-custom" class="filter-btn" type="button">Añadir a mis meteoritos</button>
+                                <button id="clear-custom" class="filter-btn" type="button">Limpiar</button>
+                            </div>
+                        </div>
+
+                        <form id="impact-form">
+                            <input type="hidden" id="impact-lat" name="lat">
+                            <input type="hidden" id="impact-lng" name="lng">
+                            <div class="form-group">
+                                <div style="display:flex; gap:8px; align-items:center;">
+                                    <input type="checkbox" id="use-api-intensity" name="use_api_intensity">
+                                    <label for="use-api-intensity" style="margin:0;">Usar intensidad desde API</label>
+                                </div>
+                                <button type="submit" style="margin-top:8px;">Calcular Impacto</button>
+                            </div>
+                        </form>
+                        <div style="margin-top:8px; display:flex; gap:8px;">
+                            <button type="button" id="sync-map" class="filter-btn">Sincronizar con Mapa</button>
+                        </div>
+                        <div id="api-params" style="margin-top:12px; padding:8px; border-top:1px solid rgba(255,255,255,0.04); font-size:13px; color:#cfe4ff; display:none;">
+                            <strong>Respuesta API:</strong>
+                            <div id="api-params-content" style="margin-top:6px; font-size:12px; color:#dfeffd;"></div>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- neo-panel eliminado para mantener sólo la pestaña de Análisis de Impacto -->
+            </div>
+        </section>
+    </main>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="{{ url_for('static', filename='map.js') }}"></script>
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulación de Órbita - Impacto Estelar</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="index.html" class="logo">Impacto Estelar</a>
+            <ul>
+                <li><a href="{{ url_for('home') }}">Inicio</a></li>
+                <li><a href="{{ url_for('simulacion') }}">Simulación</a></li>
+                <li><a href="{{ url_for('meteoritos') }}">Análisis de Impacto</a></li>
+                <li><a href="{{ url_for('fuerntes') }}">Fuentes</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="page-content">
+        <section class="container">
+            <h2>Simulación de Órbita de Meteoritos</h2>
+            <p>Esta sección presentará una simulación interactiva de las trayectorias de los meteoritos. El backend en Python se encargará de la lógica de la simulación.</p>
+            <div id="simulation-container" class="simulation-area card">
+                <!-- El backend renderizará la simulación aquí -->
+                <p>Cargando simulación...</p>
+            </div>
+        </section>
+    </main>
+</body>
+</html>
