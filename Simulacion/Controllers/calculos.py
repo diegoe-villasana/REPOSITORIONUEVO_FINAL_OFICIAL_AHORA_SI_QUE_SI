@@ -40,7 +40,7 @@ def todos(name):
         if name == metodo["name"]:
             return metodo
 
-def lista_mayor_impacto():
+def top_impacto(n=5):
     lista = datos["neos"][:]
     for i in range(1, len(lista)):
         key = lista[i]
@@ -51,7 +51,7 @@ def lista_mayor_impacto():
         lista[j + 1] = key
     
     top5 = lista[:5]
-    return json(top5)
+    return json.dumps(top5)
 
 
 
